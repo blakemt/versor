@@ -9,18 +9,32 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 #PROJECT
-project(VERSOR)
+project(VERSOR CXX)
 
 #optional flags for building graphics and examples
 set(BUILD_GRAPHICS OFF CACHE BOOL "build graphics")
 set(BUILD_EXAMPLES OFF CACHE BOOL "build examples")
 set(BUILD_SCRATCH OFF CACHE BOOL "build scratch")
 
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -U__STRICT_ANSI__ -O3 -ftemplate-depth-1200 -Wno-switch -Wno-deprecated-declarations -Wno-int-to-pointer-cast")
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -U__STRICT_ANSI__ -nostdinc++ -O3 -ftemplate-depth-1200 -Wno-switch -Wno-int-to-pointer-cast")
+set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD_REQUIRED ON)
+set (CMAKE_CXX_EXTENSIONS OFF)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3 -ftemplate-depth-1200 -Wno-switch -Wno-deprecated-declarations -Wno-int-to-pointer-cast")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -nostdinc++ -O3 -ftemplate-depth-1200 -Wno-switch -Wno-int-to-pointer-cast")
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE RelWithDebInfo)
+endif()
+
+set(VERSOR_FLAGS "-ftemplate-depth-1200 -Wno-switch -Wno-deprecated-declarations -Wno-int-to-pointer-cast")
+
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 ${VERSOR_FLAGS}")
+elseif(CMAKE_BUILD_TYPE MATCHES Release)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g0 -O3 ${VERSOR_FLAGS}")
+elseif(CMAKE_BUILD_TYPE MATCHES RelWithDebInfo)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O3 ${VERSOR_FLAGS}")
+else()
+  message(FATAL_ERROR "invalid build type or failure to set a build type.  specify Release, Debug, or RelWithDebInfo")
+endif()
 
 
 #All .cpp files in src/space get built into libvsr
@@ -30,11 +44,6 @@ link_directories(${PROJECT_BINARY_DIR})
 #PROJECT INCLUDE AND LINK
 target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR})
 target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR}/include)
-target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr)
-target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr/detail)
-target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr/space)
-target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr/form)
-target_include_directories(vsr PUBLIC ${PROJECT_SOURCE_DIR}/include/vsr/util)
 
 
 
@@ -47,7 +56,6 @@ foreach(filename ${tests})
   target_link_libraries(${target} vsr )
 endforeach()
 
-#define ${vsr_libraries}
 set(vsr_libraries vsr)
 
 
@@ -76,7 +84,7 @@ if(${BUILD_GRAPHICS})
 
   #todo: change this flag name to ${GLES} Flag
   if(${RASPBERRY})
-    add_library(vsrGfx ${graphicsGLES}) 
+    add_library(vsrGfx ${graphicsGLES})
   else()
     add_library(vsrGfx ${graphicsGL} ${graphicsGLES})
   endif()
@@ -104,7 +112,6 @@ endif()
 
 get_property(link_dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY LINK_DIRECTORIES)
 get_property(inc_dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-#set_property(GLOBAL PROPERTY VSR_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 set_property(GLOBAL PROPERTY VSR_LIBRARIES ${vsr_libraries})
 set_property(GLOBAL PROPERTY VSR_INCLUDE_DIR "${inc_dirs}")
 set_property(GLOBAL PROPERTY VSR_LINK_DIR "${link_dirs}")
@@ -119,5 +126,3 @@ set_property(GLOBAL PROPERTY VSR_LINK_DIR "${link_dirs}")
 #foreach(d ${inc_dirs})
 #  message(STATUS "include dir='${d}'")
 #endforeach()
-
-

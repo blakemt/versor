@@ -15,10 +15,10 @@
 
 #include <vector>
 
-#include "vsr.h"
+#include <vsr/vsr.h>
  
-#include "form/vsr_interp.h"  
-#include "util/vsr_patch.h"
+#include <vsr/form/vsr_interp.h>
+#include <vsr/util/vsr_patch.h>
 
 using namespace std;
 

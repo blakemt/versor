@@ -8,7 +8,7 @@
 #ifndef VSR_CGA3D_TYPES_INCLUDED
 #define VSR_CGA3D_TYPES_INCLUDED
 
-#include "detail/vsr_multivector.h"
+#include <vsr/detail/vsr_multivector.h>
 
 namespace vsr{ 
   

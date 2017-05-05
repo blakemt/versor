@@ -20,7 +20,7 @@
 #define GFX_GRAPHICS_INCLUDED
 
 #include <iostream>
-#include "vsr.h"  
+#include <vsr/vsr.h>
 
 using std::ostream;
 
