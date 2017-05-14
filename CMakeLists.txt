@@ -1,7 +1,7 @@
 #CMAKE FOR The Versor Geometric Algebra Mathematics Library
 
 #VERSION
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.4)
 
 #POLICIES
 if(COMMAND cmake_policy)
@@ -16,7 +16,7 @@ set(BUILD_GRAPHICS OFF CACHE BOOL "build graphics")
 set(BUILD_EXAMPLES OFF CACHE BOOL "build examples")
 set(BUILD_SCRATCH OFF CACHE BOOL "build scratch")
 
-set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 set (CMAKE_CXX_EXTENSIONS OFF)
 
@@ -27,15 +27,18 @@ endif()
 set(VERSOR_FLAGS "-ftemplate-depth-1200 -Wno-switch -Wno-deprecated-declarations -Wno-int-to-pointer-cast")
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 ${VERSOR_FLAGS}")
+  set(BUILD_TYPE_FLAGS "-g -O0")
 elseif(CMAKE_BUILD_TYPE MATCHES Release)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g0 -O3 ${VERSOR_FLAGS}")
+  set(BUILD_TYPE_FLAGS "-g0 -O3")
 elseif(CMAKE_BUILD_TYPE MATCHES RelWithDebInfo)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O3 ${VERSOR_FLAGS}")
+  set(BUILD_TYPE_FLAGS "-g -O3")
 else()
   message(FATAL_ERROR "invalid build type or failure to set a build type.  specify Release, Debug, or RelWithDebInfo")
 endif()
 
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${BUILD_TYPE_FLAGS} ${VERSOR_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -nostdinc++ ${BUILD_TYPE_FLAGS} ${VERSOR_FLAGS}")
 
 #All .cpp files in src/space get built into libvsr
 file(GLOB core src/space/*.cpp)
@@ -116,6 +119,17 @@ set_property(GLOBAL PROPERTY VSR_LIBRARIES ${vsr_libraries})
 set_property(GLOBAL PROPERTY VSR_INCLUDE_DIR "${inc_dirs}")
 set_property(GLOBAL PROPERTY VSR_LINK_DIR "${link_dirs}")
 
+
+install(TARGETS ${vsr_libraries}
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib)
+
+install(DIRECTORY include/vsr/detail DESTINATION include/vsr)
+install(DIRECTORY include/vsr/form   DESTINATION include/vsr)
+install(DIRECTORY include/vsr/space  DESTINATION include/vsr)
+install(DIRECTORY include/vsr/util   DESTINATION include/vsr)
+install(FILES include/vsr/vsr.h include/vsr/vsr_app.h DESTINATION include/vsr)
 
 ##PRINT DIRECTORIES
 #message("VERSOR LINK DIRECTORES")
